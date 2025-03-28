@@ -1,2 +1,9 @@
+# .gitignore
+__pycache__/
+*.pyc
 .env
-/venv
+.vscode/
+.idea/
+.venv/
+venv/
+TextToChatHistory1.db

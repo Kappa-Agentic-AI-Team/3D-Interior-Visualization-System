@@ -7,8 +7,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from typing_extensions import TypedDict
 
 #Database setup
-#DATABASE_URL=URL.create("sqlite",host="localhost",database="chat_history.db")
-DATABASE_URL="sqlite:///C:/Users/oluwasegun.ukana/Developmentenv/AI Agent/TextToChatHistory1.db"
+DATABASE_URL="sqlite:///TextToChatHistory1.db"
 engine = create_engine(DATABASE_URL,connect_args={"check_same_thread": False})
 SessionLocal=sessionmaker(bind=engine, autoflush=False,autocommit=False)
 
