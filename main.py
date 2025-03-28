@@ -13,6 +13,7 @@ from fastapi import FastAPI, HTTPException, Depends, WebSocket, WebSocketDisconn
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi import UploadFile
 
 from langchain_groq import ChatGroq
 from dotenv import load_dotenv
@@ -300,26 +301,28 @@ def text_to_image_model(state:AgentState):
         "status_code": response.status_code
     }   
             
+
 def image_to_reimagine_model(state: AgentState):
     url = 'https://clipdrop-api.co/replace-background/v1'
     headers = {'x-api-key': CLIPDROP_API_KEY, 'accept': 'image/png'}
     data = {'prompt': state["draft"]}
-    # Read the uploaded image file properly
-    image_file = state["image"].file.read()
-    files = {
-        'image_file': ('image.png', io.BytesIO(image_file), 'image/png'),
-    }
+    # Ensure state["image"] is an UploadFile object
+    if isinstance(state["image"], UploadFile):
+        files = {
+            'image_file': (state["image"].filename, state["image"].file, state["image"].content_type)
+        }
+    else:
+        raise ValueError("Invalid image input. Expected an UploadFile object.")
     response = requests.post(url, files=files, data=data, headers=headers)
     if response.ok:
         return {"content": response.content, "media_type": "image/png"}
-
     return {
         "content": response.text,
         "media_type": "text/plain",
         "status_code": response.status_code
     }
 
-          
+         
   
 #Graph Building start here        
 builder=StateGraph(AgentState)
