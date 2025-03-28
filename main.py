@@ -24,6 +24,7 @@ import matplotlib
 matplotlib.use('Agg')  # Use non-GUI backend
 import matplotlib.pyplot as plt
 import numpy as np
+import base64
 
 memory=MemorySaver()
 
@@ -402,8 +403,14 @@ async def start_generation_anon(request:AnonymousState):
         plt.close()
         img_bytes.seek(0)
 
-        # Return the image as FastAPI response
-        return Response(content=img_bytes.getvalue(), media_type="image/png")
+        # Encode the image in Base64
+        encoded = base64.b64encode(img_bytes.getvalue()).decode("utf-8")
+        # Build the Data URL
+        data_url = f"data:image/png;base64,{encoded}"
+        
+        # Return the Data URL in a JSON response
+        return JSONResponse(content={"image": data_url})
+    
     except AttributeError as e:
         return{"Error":e,
                 "Response":response.get("content",None),
